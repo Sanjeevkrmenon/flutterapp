@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
             height: 600,
             child: Center(
               child: Lottie.asset(
-                'assets/loona_eyes.json',
+                'assets/loona_eyes_angry.json',
                 width: 450,  
                 height: 400,  
                 fit: BoxFit.contain,

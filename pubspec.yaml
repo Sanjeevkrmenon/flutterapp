@@ -24,4 +24,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/loona_eyes.json
+    - assets/loona_eyes_angry.json
