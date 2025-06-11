@@ -8,7 +8,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 190, 139, 139),
+        backgroundColor: const Color.fromARGB(255, 58, 53, 53),
         body: Center(
           child: Container(
             margin: const EdgeInsets.all(36.0),
@@ -21,8 +21,8 @@ class MyApp extends StatelessWidget {
             child: Center(
               child: Lottie.asset(
                 'assets/loona_eyes.json',
-                width: 450,   // Smaller than container width (500)
-                height: 400,  // Smaller than container height (600)
+                width: 450,  
+                height: 400,  
                 fit: BoxFit.contain,
               ),
             ),
