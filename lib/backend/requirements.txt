@@ -1,2 +1,3 @@
-fastapi[all]
+Flask
+flask-cors
 textblob
