@@ -1,0 +1,117 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+
+const int portraitFrames = 6; // adjust as needed based on your pX.png files
+const int landscapeFrames = 6; // adjust as needed based on your lX.png files
+
+class SplashAnimation extends StatefulWidget {
+  final VoidCallback onFinish;
+  const SplashAnimation({required this.onFinish, Key? key}) : super(key: key);
+
+  @override
+  State<SplashAnimation> createState() => _SplashAnimationState();
+}
+
+class _SplashAnimationState extends State<SplashAnimation> with TickerProviderStateMixin {
+  int _currentFrame = 1;
+  late bool _isPortrait;
+
+  late AnimationController _fadeInController;
+  late AnimationController _fadeOutController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeInController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1300), // SLOW fade in!
+    );
+    _fadeOutController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900), // adjust as needed
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startSequence());
+  }
+
+  Future<void> _startSequence() async {
+    _isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    setState(() => _currentFrame = 1);
+
+    // ----- 1. SLOWLY FADE IN -----
+    await _fadeInController.forward(); // opacity 0 -> 1
+
+    // ----- 2. Hold -----
+    await Future.delayed(const Duration(milliseconds: 700)); // stays fully visible
+
+    // ----- 3. SLOWLY FADE OUT -----
+    await _fadeOutController.forward(); // opacity 1 -> 0
+
+    // ----- 4. Next frames -----
+    final frameCount = _isPortrait ? portraitFrames : landscapeFrames;
+    for (int frame = 2; frame <= frameCount; frame++) {
+      await Future.delayed(const Duration(milliseconds: 120)); // quick!
+      if (!mounted) return;
+      setState(() => _currentFrame = frame);
+    }
+    await Future.delayed(const Duration(milliseconds: 320));
+    if (mounted) widget.onFinish();
+  }
+
+  String _framePath() {
+    if (_isPortrait) {
+      return "assets/splash/portrait/p$_currentFrame.png";
+    } else {
+      return "assets/splash/landscape/l$_currentFrame.png";
+    }
+  }
+
+  @override
+  void dispose() {
+    _fadeInController.dispose();
+    _fadeOutController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // --- The "PARABOT" Frame (fade in, hold, fade out) ---
+    if (_currentFrame == 1) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: AnimatedBuilder(
+            animation: Listenable.merge([_fadeInController, _fadeOutController]),
+            builder: (context, child) {
+              // Calculate opacity: starts at 0, goes to 1 with _fadeInController.value,
+              // then decreases from 1 to 0 as _fadeOutController.value goes from 0 to 1.
+              double opacity = _fadeInController.value * (1 - _fadeOutController.value);
+              return Opacity(
+                opacity: opacity,
+                child: child,
+              );
+            },
+            child: Image.asset(
+              _framePath(),
+              width: 340,
+              height: 340,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      );
+    } else {
+      // --- All other frames (just swap images) ---
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Image.asset(
+            _framePath(),
+            width: 340,
+            height: 340,
+            fit: BoxFit.contain,
+          ),
+        ),
+      );
+    }
+  }
+}
